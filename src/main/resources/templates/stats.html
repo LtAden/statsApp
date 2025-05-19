@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stats</title>
+    <script>
+        function addStat() {
+            const name = prompt("Enter the name of the new stat:");
+            if (name) {
+                const form = document.createElement("form");
+                form.method = "post";
+                form.action = "/stats/add";
+
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "statName";
+                input.value = name;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Stats</h1>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Count</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="stat, iterStat : ${stats}">
+        <td th:text="${stat.statName}"></td>
+        <td th:text="${stat.count}"></td>
+        <td>
+            <form th:action="@{/stats/increment/{index}(index=${iterStat.index})}" method="post" style="display: inline;">
+                <button type="submit">+1</button>
+            </form>
+        </td>
+    </tr>
+</table>
+<button onclick="addStat()">Add New Stat</button>
+</body>
+</html>
