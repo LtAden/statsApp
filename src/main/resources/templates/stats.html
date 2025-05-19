@@ -28,7 +28,9 @@
     <tr>
         <th>Name</th>
         <th>Count</th>
-        <th>Action</th>
+        <th>Increment</th>
+        <th>Add Custom Amount</th>
+        <th>Archivise</th>>
     </tr>
     <tr th:each="stat, iterStat : ${stats}">
         <td th:text="${stat.statName}"></td>
@@ -43,6 +45,12 @@
                 <input type="hidden" name="index" th:value="${iterStat.index}" />
                 <input type="number" name="count" value="" required />
                 <button type="submit">Add Amount</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/stats/archive}" method="post" style="display: inline;">
+                <input type="hidden" name="index" th:value="${iterStat.index}" />
+                <button type="submit">Archive stat</button>
             </form>
         </td>
     </tr>

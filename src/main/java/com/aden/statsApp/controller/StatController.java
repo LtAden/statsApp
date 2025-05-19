@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping("/stats")
 public class StatController {
     private final List<Stat> stats = new ArrayList<>();
+    private final List<Stat> archive = new ArrayList<>();
 
     @GetMapping
     public String viewStats(Model model) {
@@ -44,6 +45,15 @@ public class StatController {
         if (index >= 0 && index < stats.size()) {
             Stat stat = stats.get(index);
             stat.setCount(stat.getCount() + count);
+        }
+        return "redirect:/stats";
+    }
+
+    @PostMapping("/archive")
+    public String archiveStat(@RequestParam int index){
+        if (index >= 0 && index < stats.size()) {
+            archive.add(stats.get(index));
+            stats.remove(index);
         }
         return "redirect:/stats";
     }
