@@ -13,26 +13,37 @@ import java.util.List;
 public class StatController {
     private final List<Stat> stats = new ArrayList<>();
 
-    // Display all stats
     @GetMapping
     public String viewStats(Model model) {
         model.addAttribute("stats", stats);
-        return "stats"; // Thymeleaf template name: stats.html
+        return "stats";
     }
 
-    // Add a new stat
+    @GetMapping("/")
+    public String redirToStats(){
+        return "redirect:/stats";
+    }
+
     @PostMapping("/add")
     public String addStat(@RequestParam String statName) {
         stats.add(new Stat(statName, 0)); // Add stat with a count of 0
         return "redirect:/stats";
     }
 
-    // Increment the count of a stat
     @PostMapping("/increment/{index}")
-    public String incrementStat(@PathVariable int index) {
+    public String incrementByOne(@PathVariable int index) {
         if (index >= 0 && index < stats.size()) {
             Stat stat = stats.get(index);
             stat.setCount(stat.getCount() + 1);
+        }
+        return "redirect:/stats";
+    }
+
+    @PostMapping("/addCustomAmount")
+    public String addCustomAmount(@RequestParam int index, @RequestParam int count){
+        if (index >= 0 && index < stats.size()) {
+            Stat stat = stats.get(index);
+            stat.setCount(stat.getCount() + count);
         }
         return "redirect:/stats";
     }

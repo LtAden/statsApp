@@ -38,6 +38,13 @@
                 <button type="submit">+1</button>
             </form>
         </td>
+        <td>
+            <form th:action="@{/stats/addCustomAmount}" method="post" style="display: inline;">
+                <input type="hidden" name="index" th:value="${iterStat.index}" />
+                <input type="number" name="count" value="" required />
+                <button type="submit">Add Amount</button>
+            </form>
+        </td>
     </tr>
 </table>
 <button onclick="addStat()">Add New Stat</button>
