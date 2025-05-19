@@ -24,13 +24,14 @@
 </head>
 <body>
 <h1>Stats</h1>
+<div>
 <table>
     <tr>
         <th>Name</th>
         <th>Count</th>
         <th>Increment</th>
         <th>Add Custom Amount</th>
-        <th>Archivise</th>>
+        <th>Archivise</th>
     </tr>
     <tr th:each="stat, iterStat : ${stats}">
         <td th:text="${stat.statName}"></td>
@@ -55,6 +56,20 @@
         </td>
     </tr>
 </table>
+</div>
+<h2>Archive</h2>
+<div>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Count</th>
+        </tr>
+        <tr th:each="archivedStat, iterStat : ${archive}">
+            <td th:text="${archivedStat.statName}"></td>
+            <td th:text="${archivedStat.count}"></td>
+        </tr>
+    </table>
+</div>
 <button onclick="addStat()">Add New Stat</button>
 </body>
 </html>

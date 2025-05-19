@@ -17,6 +17,7 @@ public class StatController {
     @GetMapping
     public String viewStats(Model model) {
         model.addAttribute("stats", stats);
+        model.addAttribute("archive", archive);
         return "stats";
     }
 
