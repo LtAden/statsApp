@@ -1,15 +1,10 @@
 package com.aden.statsApp.controller;
 
-import com.aden.statsApp.model.Stat;
 import com.aden.statsApp.service.StatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 @Controller
 @RequestMapping("/stats")
 public class StatController {
