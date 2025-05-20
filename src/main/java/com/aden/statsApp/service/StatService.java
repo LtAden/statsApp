@@ -1,24 +1,30 @@
 package com.aden.statsApp.service;
 
+import com.aden.statsApp.DAO.StatWrapperDAO;
 import com.aden.statsApp.model.Stat;
 import com.aden.statsApp.model.StatWrapper;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 @Getter
 public class StatService {
     private StatWrapper statWrapper;
+    private StatWrapperDAO statWrapperDAO;
 
     @Autowired
-    public StatService(StatWrapper statWrapper){
-        this.statWrapper = statWrapper;
+    public StatService(StatWrapperDAO statWrapperDAO){
+        this.statWrapperDAO = statWrapperDAO;
+        this.statWrapper = statWrapperDAO.readWrapperFromFile();
     }
 
     public void addNewStat(String newStatName) {
         Stat newStat = new Stat(newStatName, 0);
         statWrapper.getCurrentStats().add(newStat);
+        saveAndReloadStats();
     }
 
     public void incrementStatByOne(int statIndex) {
@@ -33,6 +39,7 @@ public class StatService {
         if (index >= 0 && index < statWrapper.getCurrentStats().size()) {
             statWrapper.getArchivedStats().add(statWrapper.getCurrentStats().get(index));
             statWrapper.getCurrentStats().remove(index);
+            saveAndReloadStats();
         }
     }
 
@@ -40,6 +47,16 @@ public class StatService {
         if (index >= 0 && index < statWrapper.getCurrentStats().size()) {
             Stat stat = statWrapper.getCurrentStats().get(index);
             stat.setCount(stat.getCount() + count);
+            saveAndReloadStats();
+        }
+    }
+
+    private void saveAndReloadStats(){
+        try {
+            statWrapperDAO.saveStatWrapperToFile(this.statWrapper);
+            this.statWrapper = statWrapperDAO.readWrapperFromFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
