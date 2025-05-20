@@ -1,6 +1,8 @@
 package com.aden.statsApp.controller;
 
 import com.aden.statsApp.model.Stat;
+import com.aden.statsApp.service.StatService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,51 +13,41 @@ import java.util.List;
 @Controller
 @RequestMapping("/stats")
 public class StatController {
-    private final List<Stat> stats = new ArrayList<>();
-    private final List<Stat> archive = new ArrayList<>();
+    private final StatService statService;
+
+    @Autowired
+    public StatController(StatService statService) {
+        this.statService = statService;
+    }
 
     @GetMapping
     public String viewStats(Model model) {
-        model.addAttribute("stats", stats);
-        model.addAttribute("archive", archive);
+        model.addAttribute("stats", statService.getStats());
+        model.addAttribute("archive", statService.getArchive());
         return "stats";
-    }
-
-    @GetMapping("/")
-    public String redirToStats(){
-        return "redirect:/stats";
     }
 
     @PostMapping("/add")
     public String addStat(@RequestParam String statName) {
-        stats.add(new Stat(statName, 0)); // Add stat with a count of 0
+        statService.addNewStat(statName);
         return "redirect:/stats";
     }
 
     @PostMapping("/increment/{index}")
     public String incrementByOne(@PathVariable int index) {
-        if (index >= 0 && index < stats.size()) {
-            Stat stat = stats.get(index);
-            stat.setCount(stat.getCount() + 1);
-        }
+        statService.incrementStatByOne(index);
         return "redirect:/stats";
     }
 
     @PostMapping("/addCustomAmount")
     public String addCustomAmount(@RequestParam int index, @RequestParam int count){
-        if (index >= 0 && index < stats.size()) {
-            Stat stat = stats.get(index);
-            stat.setCount(stat.getCount() + count);
-        }
+        statService.addCustomAmountToStatAtIndex(index, count);
         return "redirect:/stats";
     }
 
     @PostMapping("/archive")
     public String archiveStat(@RequestParam int index){
-        if (index >= 0 && index < stats.size()) {
-            archive.add(stats.get(index));
-            stats.remove(index);
-        }
+        statService.archiveStatAtIndex(index);
         return "redirect:/stats";
     }
 }
