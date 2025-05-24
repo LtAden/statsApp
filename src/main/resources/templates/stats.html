@@ -8,7 +8,7 @@
             if (name) {
                 const form = document.createElement("form");
                 form.method = "post";
-                form.action = "/stats/add";
+                form.action = "/add";
 
                 const input = document.createElement("input");
                 input.type = "hidden";
@@ -37,19 +37,19 @@
         <td th:text="${stat.statName}"></td>
         <td th:text="${stat.count}"></td>
         <td>
-            <form th:action="@{/stats/increment/{index}(index=${iterStat.index})}" method="post" style="display: inline;">
+            <form th:action="@{/increment/{index}(index=${iterStat.index})}" method="post" style="display: inline;">
                 <button type="submit">+1</button>
             </form>
         </td>
         <td>
-            <form th:action="@{/stats/addCustomAmount}" method="post" style="display: inline;">
+            <form th:action="@{/addCustomAmount}" method="post" style="display: inline;">
                 <input type="hidden" name="index" th:value="${iterStat.index}" />
                 <input type="number" name="count" value="" required />
                 <button type="submit">Add Amount</button>
             </form>
         </td>
         <td>
-            <form th:action="@{/stats/archive}" method="post" style="display: inline;">
+            <form th:action="@{/archive}" method="post" style="display: inline;">
                 <input type="hidden" name="index" th:value="${iterStat.index}" />
                 <button type="submit">Archive stat</button>
             </form>

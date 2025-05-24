@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 @Controller
-@RequestMapping("/stats")
+@RequestMapping("/")
 public class StatController {
     private final StatService statService;
 
@@ -25,24 +25,24 @@ public class StatController {
     @PostMapping("/add")
     public String addStat(@RequestParam String statName) {
         statService.addNewStat(statName);
-        return "redirect:/stats";
+        return "redirect:/";
     }
 
     @PostMapping("/increment/{index}")
     public String incrementByOne(@PathVariable int index) {
         statService.incrementStatByOne(index);
-        return "redirect:/stats";
+        return "redirect:/";
     }
 
     @PostMapping("/addCustomAmount")
     public String addCustomAmount(@RequestParam int index, @RequestParam int count){
         statService.addCustomAmountToStatAtIndex(index, count);
-        return "redirect:/stats";
+        return "redirect:/";
     }
 
     @PostMapping("/archive")
     public String archiveStat(@RequestParam int index){
         statService.archiveStatAtIndex(index);
-        return "redirect:/stats";
+        return "redirect:/";
     }
 }
