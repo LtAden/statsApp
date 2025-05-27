@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @Getter
@@ -24,6 +28,7 @@ public class StatService {
     public void addNewStat(String newStatName) {
         Stat newStat = new Stat(newStatName, 0);
         statWrapper.getCurrentStats().add(newStat);
+        sortListByStatName(statWrapper.getCurrentStats());
         saveAndReloadStats();
     }
 
@@ -39,6 +44,7 @@ public class StatService {
         if (index >= 0 && index < statWrapper.getCurrentStats().size()) {
             statWrapper.getArchivedStats().add(statWrapper.getCurrentStats().get(index));
             statWrapper.getCurrentStats().remove(index);
+            sortListByStatName(statWrapper.getArchivedStats());
             saveAndReloadStats();
         }
     }
@@ -58,5 +64,9 @@ public class StatService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sortListByStatName(List<Stat> listToSort){
+        listToSort.sort(Comparator.comparing(Stat::getStatName));
     }
 }
