@@ -3,9 +3,14 @@ package com.aden.statsApp.service;
 import com.aden.statsApp.DAO.StatWrapperDAO;
 import com.aden.statsApp.model.Stat;
 import com.aden.statsApp.model.StatWrapper;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -82,5 +87,19 @@ class StatServiceTest {
                 () -> assertEquals(1, statService.getStatWrapper().getArchivedStats().size()),
                 () -> assertEquals(sampleStat, statService.getStatWrapper().getArchivedStats().get(0))
         );
+    }
+
+    @Test
+    void testStatThrowsRuntimeExcpetionWhenEncounteringIoExceptionWhenSavingAndUpdatingStatFile() throws IOException {
+        StatService statService = setupStatServiceWithOneStat();
+        verify(statService.getStatWrapperDAO(), times(1)).readWrapperFromFile();
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 0);
+
+        doThrow(new IOException("test exception"))
+                .when(statService.getStatWrapperDAO())
+                .saveStatWrapperToFile(any(StatWrapper.class));
+
+        assertThrows(RuntimeException.class, () -> statService.incrementStatByOne(0));
+
     }
 }

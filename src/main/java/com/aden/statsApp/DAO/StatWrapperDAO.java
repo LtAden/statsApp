@@ -2,24 +2,25 @@ package com.aden.statsApp.DAO;
 
 import com.aden.statsApp.model.StatWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.cglib.core.Local;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
+@Getter
+@Setter
 public class StatWrapperDAO {
 
     @Value("${stat.file.path:stats.json}")
@@ -29,12 +30,12 @@ public class StatWrapperDAO {
     private final String APP_DATA_KEY = "APPDATA";
     private final String APP_DATA_DIRECTORY = System.getenv(APP_DATA_KEY);
     private final String BACKUP_DIRECTORY_SUFFIX = "aden\\statsApp\\";
-    private final String BACKUP_DIRECTORY = String.format("%s\\%s", APP_DATA_DIRECTORY, BACKUP_DIRECTORY_SUFFIX);
+    private String backupDirectory = String.format("%s\\%s", APP_DATA_DIRECTORY, BACKUP_DIRECTORY_SUFFIX);
     ObjectMapper objectMapper = new ObjectMapper();
 
     @EventListener(ApplicationReadyEvent.class)
     public void updateBackupsFolder() {
-        String todayBackupFileName =String.format("%s.json", getTodayDate());
+        String todayBackupFileName = String.format("%s.json", getTodayDate());
         Set<String> backupDirectoryContents = listBackupDirectoryContents();
         if(!backupDirectoryContents.contains(todayBackupFileName)){
             createDailyBackupAndRemoveExtraFiles(todayBackupFileName);
@@ -61,7 +62,7 @@ public class StatWrapperDAO {
     }
 
     private Set<String> listBackupDirectoryContents() {
-        File[] listOfBackupFiles = new File(BACKUP_DIRECTORY).listFiles();
+        File[] listOfBackupFiles = new File(backupDirectory).listFiles();
         if(listOfBackupFiles == null || listOfBackupFiles.length == 0){
             return new HashSet<String>();
         }
@@ -71,7 +72,7 @@ public class StatWrapperDAO {
                 .collect(Collectors.toSet());
     }
 
-    private void createDailyBackupAndRemoveExtraFiles(String dateToday){
+    void createDailyBackupAndRemoveExtraFiles(String dateToday){
         File statFile = new File(statFileLocation);
         if(statFile.exists() && !statFile.isDirectory()){
             copyStatFileToBackupDirectory(dateToday);
@@ -81,7 +82,7 @@ public class StatWrapperDAO {
     }
 
     private void copyStatFileToBackupDirectory(String dateToday){
-        File targetFile = new File(String.format("%s\\%s", BACKUP_DIRECTORY, dateToday));
+        File targetFile = new File(String.format("%s\\%s", backupDirectory, dateToday));
         try {
             FileUtils.copyFile(new File(statFileLocation), targetFile);
             targetFile.setLastModified(System.currentTimeMillis());
@@ -90,8 +91,8 @@ public class StatWrapperDAO {
         }
     }
 
-    private void deleteExtraFilesFromBackupDirectory() {
-        File[] logFiles = new File(BACKUP_DIRECTORY).listFiles();
+    void deleteExtraFilesFromBackupDirectory() {
+        File[] logFiles = new File(backupDirectory).listFiles();
         while (logFiles != null && logFiles.length > maxBackupFilesCount) {
             long oldestDate = Long.MAX_VALUE;
             File oldestFile = null;
@@ -105,7 +106,7 @@ public class StatWrapperDAO {
                 oldestFile.delete();
             }
 
-            logFiles = new File(BACKUP_DIRECTORY).listFiles();
+            logFiles = new File(backupDirectory).listFiles();
         }
     }
 }

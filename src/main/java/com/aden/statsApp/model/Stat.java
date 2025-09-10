@@ -6,7 +6,6 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
-@NoArgsConstructor
 public class Stat {
     String statName;
     int count;
