@@ -3,13 +3,9 @@ package com.aden.statsApp.service;
 import com.aden.statsApp.DAO.StatWrapperDAO;
 import com.aden.statsApp.model.Stat;
 import com.aden.statsApp.model.StatWrapper;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,17 +16,21 @@ class StatServiceTest {
 
     private StatService setupStatServiceWithOneStat() {
         StatWrapperDAO mockDao = Mockito.mock(StatWrapperDAO.class);
+
         StatWrapper mockWrapper = new StatWrapper();
         mockWrapper.getCurrentStats().add(sampleStat);
         when(mockDao.readWrapperFromFile()).thenReturn(mockWrapper);
+
         return new StatService(mockDao);
     }
 
     @Test
     void testCanAddNewStat() {
         StatWrapperDAO mockDao = Mockito.mock(StatWrapperDAO.class);
+
         StatWrapper mockWrapper = new StatWrapper();
         when(mockDao.readWrapperFromFile()).thenReturn(mockWrapper);
+
         StatService statService = new StatService(mockDao);
         assertEquals(statService.getStatWrapper().getCurrentStats().size(), 0);
         verify(mockDao, times(1)).readWrapperFromFile();

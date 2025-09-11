@@ -2,13 +2,12 @@ package com.aden.statsApp.DAO;
 
 import com.aden.statsApp.model.StatWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.apache.commons.io.FileUtils;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +50,7 @@ class StatWrapperDAOTest {
     }
 
     @Test
-    void testReadWrapperCorrectlyReadsWrapperAndInvokesCorrectMethods() throws Exception {
+    void testReadWrapperReadsWrapperAndInvokesCorrectMethods() throws Exception {
         StatWrapper testWrapper = new StatWrapper();
         when(mockMapper.readValue(any(File.class), eq(StatWrapper.class))).thenReturn(testWrapper);
 

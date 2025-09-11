@@ -10,7 +10,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.ui.Model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -32,7 +32,7 @@ class StatControllerTest {
 
         StatWrapper wrapper = new StatWrapper();
         wrapper.getCurrentStats().add(new Stat("Test Stat", 0));
-        wrapper.getArchivedStats().add(new Stat("Archived Stat", 1));
+        wrapper.getArchivedStats().add(new Stat("Archived Stat", 0));
         when(mockService.getStatWrapper()).thenReturn(wrapper);
 
         Model mockModel = mock(Model.class);

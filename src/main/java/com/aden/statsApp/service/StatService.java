@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,10 +15,10 @@ import java.util.List;
 @Getter
 public class StatService {
     private StatWrapper statWrapper;
-    private StatWrapperDAO statWrapperDAO;
+    private final StatWrapperDAO statWrapperDAO;
 
     @Autowired
-    public StatService(StatWrapperDAO statWrapperDAO){
+    public StatService(StatWrapperDAO statWrapperDAO) {
         this.statWrapperDAO = statWrapperDAO;
         this.statWrapper = statWrapperDAO.readWrapperFromFile();
     }
@@ -57,7 +55,7 @@ public class StatService {
         }
     }
 
-    private void saveAndReloadStats(){
+    private void saveAndReloadStats() {
         try {
             statWrapperDAO.saveStatWrapperToFile(this.statWrapper);
             this.statWrapper = statWrapperDAO.readWrapperFromFile();
@@ -66,7 +64,7 @@ public class StatService {
         }
     }
 
-    private void sortListByStatName(List<Stat> listToSort){
+    private void sortListByStatName(List<Stat> listToSort) {
         listToSort.sort(Comparator.comparing(Stat::getStatName));
     }
 }
