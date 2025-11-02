@@ -41,8 +41,8 @@ class StatControllerTest {
         String viewName = controller.viewStats(mockModel);
 
         assertEquals("stats", viewName); // the Thymeleaf view name
-        verify(mockModel).addAttribute("stats", wrapper.getCurrentStats());
-        verify(mockModel).addAttribute("archive", wrapper.getArchivedStats());
+        verify(mockModel).addAttribute("stats", mockService.getSortedCurrentStats());
+        verify(mockModel).addAttribute("archive", mockService.getSortedArchivedStats());
     }
 
     @Test

@@ -18,8 +18,8 @@ public class StatController {
 
     @GetMapping
     public String viewStats(Model model) {
-        model.addAttribute("stats", statService.getStatWrapper().getCurrentStats());
-        model.addAttribute("archive", statService.getStatWrapper().getArchivedStats());
+        model.addAttribute("stats", statService.getSortedCurrentStats());
+        model.addAttribute("archive", statService.getSortedArchivedStats());
         return "stats";
     }
 

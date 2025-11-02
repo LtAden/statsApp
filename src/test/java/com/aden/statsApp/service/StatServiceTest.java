@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -106,5 +110,64 @@ class StatServiceTest {
 
         assertThrows(RuntimeException.class, () -> statService.incrementStatByOne(mockStatName));
 
+    }
+
+    @Test
+    void testGetSortedStatsReturnsStatsOrderedByName() {
+        StatWrapperDAO mockDao = Mockito.mock(StatWrapperDAO.class);
+
+        StatWrapper mockWrapper = new StatWrapper();
+        when(mockDao.readWrapperFromFile()).thenReturn(mockWrapper);
+
+        StatService statService = new StatService(mockDao);
+        assertEquals(statService.getStatWrapper().getCurrentStats().size(), 0);
+        verify(mockDao, times(1)).readWrapperFromFile();
+
+        statService.addNewStat("New Stat");
+        statService.addNewStat("An Even Newer Stat");
+        statService.addNewStat("Old New Stat");
+
+        Map<String, Stat> currentStats = statService.getSortedCurrentStats();
+
+        assertAll(
+                () -> assertEquals(3, statService.getStatWrapper().getCurrentStats().size()),
+                () -> {
+                    List<String> keys = new ArrayList<>(currentStats.keySet());
+                    List<String> sortedKeys = new ArrayList<>(keys);
+                    Collections.sort(sortedKeys);
+                    assertEquals(sortedKeys, keys, "Stats are not ordered alphabetically by name");
+                }
+        );
+    }
+
+    @Test
+    void testGetSortedArchiveStatsReturnsStatsOrderedByName() {
+        StatWrapperDAO mockDao = Mockito.mock(StatWrapperDAO.class);
+
+        StatWrapper mockWrapper = new StatWrapper();
+        when(mockDao.readWrapperFromFile()).thenReturn(mockWrapper);
+
+        StatService statService = new StatService(mockDao);
+        assertEquals(statService.getStatWrapper().getCurrentStats().size(), 0);
+        verify(mockDao, times(1)).readWrapperFromFile();
+
+        statService.addNewStat("New Stat");
+        statService.archiveStatByName("New Stat");
+        statService.addNewStat("An Even Newer Stat");
+        statService.archiveStatByName("An Even Newer Stat");
+        statService.addNewStat("Old New Stat");
+        statService.archiveStatByName("Old New Stat");
+
+        Map<String, Stat> sortedArchivedStats = statService.getSortedArchivedStats();
+
+        assertAll(
+                () -> assertEquals(3, statService.getStatWrapper().getArchivedStats().size()),
+                () -> {
+                    List<String> keys = new ArrayList<>(sortedArchivedStats.keySet());
+                    List<String> sortedKeys = new ArrayList<>(keys);
+                    Collections.sort(sortedKeys);
+                    assertEquals(sortedKeys, keys, "Stats are not ordered alphabetically by name");
+                }
+        );
     }
 }
