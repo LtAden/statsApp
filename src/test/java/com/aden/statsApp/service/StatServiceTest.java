@@ -12,13 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class StatServiceTest {
-    private final Stat sampleStat = new Stat("New Stat", 0);
+    private final Stat sampleStat = new Stat(0);
+    private final String mockStatName = "Mock Stat";
 
     private StatService setupStatServiceWithOneStat() {
         StatWrapperDAO mockDao = Mockito.mock(StatWrapperDAO.class);
 
         StatWrapper mockWrapper = new StatWrapper();
-        mockWrapper.getCurrentStats().add(sampleStat);
+        mockWrapper.getCurrentStats().put(mockStatName, sampleStat);
         when(mockDao.readWrapperFromFile()).thenReturn(mockWrapper);
 
         return new StatService(mockDao);
@@ -38,9 +39,9 @@ class StatServiceTest {
         statService.addNewStat("New Stat");
         assertAll(
                 () -> assertEquals(1, statService.getStatWrapper().getCurrentStats().size()),
-                () -> assertEquals(0, statService.getStatWrapper().getArchivedStats().size()),
-                () -> assertEquals("New Stat", statService.getStatWrapper().getCurrentStats().get(0).getStatName()),
-                () -> assertEquals(0, statService.getStatWrapper().getCurrentStats().get(0).getCount())
+                () -> assertTrue(statService.getStatWrapper().getCurrentStats().containsKey("New Stat")),
+                () -> assertEquals(0, statService.getStatWrapper().getCurrentStats().get("New Stat").getCount()),
+                () -> assertEquals(0, statService.getStatWrapper().getArchivedStats().size())
         );
         verify(mockDao, times(2)).readWrapperFromFile();
     }
@@ -49,26 +50,29 @@ class StatServiceTest {
     void testStatCanBeIncrementedByOneAndDaoIsRefreshedFromFileEveryTime() {
         StatService statService = setupStatServiceWithOneStat();
         verify(statService.getStatWrapperDAO(), times(1)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 0);
+        assertAll(
+                () -> assertTrue(statService.getStatWrapper().getCurrentStats().containsKey(mockStatName)),
+                () -> assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 0)
+        );
 
-        statService.incrementStatByOne(0);
+        statService.incrementStatByOne(mockStatName);
         verify(statService.getStatWrapperDAO(), times(2)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 1);
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 1);
     }
 
     @Test
     void testAddCustomAmountPersistsValuesAndReadsFromFileEveryTime() {
         StatService statService = setupStatServiceWithOneStat();
         verify(statService.getStatWrapperDAO(), times(1)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 0);
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 0);
 
-        statService.addCustomAmountToStatAtIndex(0, 37);
+        statService.addCustomAmountToStatByName(mockStatName, 37);
         verify(statService.getStatWrapperDAO(), times(2)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 37);
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 37);
 
-        statService.addCustomAmountToStatAtIndex(0, 3);
+        statService.addCustomAmountToStatByName(mockStatName, 3);
         verify(statService.getStatWrapperDAO(), times(3)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 40);
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 40);
     }
 
     @Test
@@ -80,26 +84,27 @@ class StatServiceTest {
                 () -> assertEquals(0, statService.getStatWrapper().getArchivedStats().size())
         );
 
-        statService.archiveStatAtIndex(0);
+        statService.archiveStatByName(mockStatName);
         verify(statService.getStatWrapperDAO(), times(2)).readWrapperFromFile();
         assertAll(
                 () -> assertEquals(0, statService.getStatWrapper().getCurrentStats().size()),
                 () -> assertEquals(1, statService.getStatWrapper().getArchivedStats().size()),
-                () -> assertEquals(sampleStat, statService.getStatWrapper().getArchivedStats().get(0))
+                () -> assertTrue(statService.getStatWrapper().getArchivedStats().containsKey(mockStatName)),
+                () -> assertEquals(sampleStat, statService.getStatWrapper().getArchivedStats().get(mockStatName))
         );
     }
 
     @Test
-    void testStatThrowsRuntimeExcpetionWhenEncounteringIoExceptionWhenSavingAndUpdatingStatFile() throws IOException {
+    void testStatThrowsRuntimeExceptionWhenEncounteringIoExceptionWhenSavingAndUpdatingStatFile() throws IOException {
         StatService statService = setupStatServiceWithOneStat();
         verify(statService.getStatWrapperDAO(), times(1)).readWrapperFromFile();
-        assertEquals(statService.getStatWrapper().getCurrentStats().get(0).getCount(), 0);
+        assertEquals(statService.getStatWrapper().getCurrentStats().get(mockStatName).getCount(), 0);
 
         doThrow(new IOException("test exception"))
                 .when(statService.getStatWrapperDAO())
                 .saveStatWrapperToFile(any(StatWrapper.class));
 
-        assertThrows(RuntimeException.class, () -> statService.incrementStatByOne(0));
+        assertThrows(RuntimeException.class, () -> statService.incrementStatByOne(mockStatName));
 
     }
 }

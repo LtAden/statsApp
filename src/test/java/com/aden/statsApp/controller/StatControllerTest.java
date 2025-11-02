@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = StatController.class)
 class StatControllerTest {
 
+    public static final String MOCK_STAT_NAME = "Mock Stat";
+    private static final String STAT_NAME_PARAM = "statName";
     @Autowired
     private MockMvc mockMvc;
 
@@ -31,8 +33,8 @@ class StatControllerTest {
         StatController controller = new StatController(mockService);
 
         StatWrapper wrapper = new StatWrapper();
-        wrapper.getCurrentStats().add(new Stat("Test Stat", 0));
-        wrapper.getArchivedStats().add(new Stat("Archived Stat", 0));
+        wrapper.getCurrentStats().put("Test Stat", new Stat(0));
+        wrapper.getArchivedStats().put("Archived Stat", new Stat(0));
         when(mockService.getStatWrapper()).thenReturn(wrapper);
 
         Model mockModel = mock(Model.class);
@@ -45,37 +47,37 @@ class StatControllerTest {
 
     @Test
     void testAddStatCorrectlyInvokesService() throws Exception {
-        mockMvc.perform(post("/add").param("statName", "New Stat"))
+        mockMvc.perform(post("/add").param(STAT_NAME_PARAM, MOCK_STAT_NAME))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
-        verify(statService).addNewStat("New Stat");
+        verify(statService).addNewStat(MOCK_STAT_NAME);
     }
 
     @Test
     void testIncrementByOneCorrectlyInvokesService() throws Exception {
-        mockMvc.perform(post("/increment/1"))
+        mockMvc.perform(post("/increment").param(STAT_NAME_PARAM, MOCK_STAT_NAME))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
-        verify(statService).incrementStatByOne(1);
+        verify(statService).incrementStatByOne("Mock Stat");
     }
 
     @Test
     void testIncrementByCustomCorrectlyInvokesService() throws Exception {
-        mockMvc.perform(post("/addCustomAmount").param("index", "1").param("count", "36"))
+        mockMvc.perform(post("/addCustomAmount").param(STAT_NAME_PARAM, MOCK_STAT_NAME).param("count", "36"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
-        verify(statService).addCustomAmountToStatAtIndex(1, 36);
+        verify(statService).addCustomAmountToStatByName(MOCK_STAT_NAME, 36);
     }
 
     @Test
     void testArchiveStatCorrectlyInvokesService() throws Exception {
-        mockMvc.perform(post("/archive").param("index", "1"))
+        mockMvc.perform(post("/archive").param(STAT_NAME_PARAM, MOCK_STAT_NAME))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
-        verify(statService).archiveStatAtIndex(1);
+        verify(statService).archiveStatByName(MOCK_STAT_NAME);
     }
 }

@@ -48,10 +48,11 @@ public class StatWrapperDAO {
     }
 
     public StatWrapper readWrapperFromFile() {
+        File statFile = new File(statFileLocation);
         try {
-            return objectMapper.readValue(new File(statFileLocation), StatWrapper.class);
+            return objectMapper.readValue(statFile, StatWrapper.class);
         } catch (IOException e) {
-            System.out.println("Failed to read from file, file may be missing or damaged? Creating new StatWrapper");
+            System.out.printf("Failed to read from file at expected directory of [%s], file may be missing or damaged? Creating new StatWrapper%n", statFile.getAbsolutePath());
             return new StatWrapper();
         }
     }

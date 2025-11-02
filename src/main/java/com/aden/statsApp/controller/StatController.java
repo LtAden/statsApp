@@ -29,21 +29,21 @@ public class StatController {
         return "redirect:/";
     }
 
-    @PostMapping("/increment/{index}")
-    public String incrementByOne(@PathVariable int index) {
-        statService.incrementStatByOne(index);
+    @PostMapping("/increment")
+    public String incrementByOne(@RequestParam String statName) {
+        statService.incrementStatByOne(statName);
         return "redirect:/";
     }
 
     @PostMapping("/addCustomAmount")
-    public String addCustomAmount(@RequestParam int index, @RequestParam int count) {
-        statService.addCustomAmountToStatAtIndex(index, count);
+    public String addCustomAmount(@RequestParam String statName, @RequestParam int count) {
+        statService.addCustomAmountToStatByName(statName, count);
         return "redirect:/";
     }
 
     @PostMapping("/archive")
-    public String archiveStat(@RequestParam int index) {
-        statService.archiveStatAtIndex(index);
+    public String archiveStat(@RequestParam String statName) {
+        statService.archiveStatByName(statName);
         return "redirect:/";
     }
 }

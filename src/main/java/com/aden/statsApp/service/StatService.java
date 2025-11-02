@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
 
 @Service
 @Getter
@@ -24,35 +22,29 @@ public class StatService {
     }
 
     public void addNewStat(String newStatName) {
-        Stat newStat = new Stat(newStatName, 0);
-        statWrapper.getCurrentStats().add(newStat);
-        sortListByStatName(statWrapper.getCurrentStats());
+        Stat newStat = new Stat(0);
+        statWrapper.getCurrentStats().put(newStatName, newStat);
         saveAndReloadStats();
     }
 
-    public void incrementStatByOne(int statIndex) {
-        incrementStatByValue(statIndex, 1);
+    public void incrementStatByOne(String statName) {
+        incrementStatByValue(statName, 1);
     }
 
-    public void addCustomAmountToStatAtIndex(int index, int count) {
-        incrementStatByValue(index, count);
+    public void addCustomAmountToStatByName(String statName, int count) {
+        incrementStatByValue(statName, count);
     }
 
-    public void archiveStatAtIndex(int index) {
-        if (index >= 0 && index < statWrapper.getCurrentStats().size()) {
-            statWrapper.getArchivedStats().add(statWrapper.getCurrentStats().get(index));
-            statWrapper.getCurrentStats().remove(index);
-            sortListByStatName(statWrapper.getArchivedStats());
-            saveAndReloadStats();
-        }
+    public void archiveStatByName(String statName) {
+        statWrapper.getArchivedStats().put(statName, statWrapper.getCurrentStats().get(statName));
+        statWrapper.getCurrentStats().remove(statName);
+        saveAndReloadStats();
     }
 
-    private void incrementStatByValue(int index, int count) {
-        if (index >= 0 && index < statWrapper.getCurrentStats().size()) {
-            Stat stat = statWrapper.getCurrentStats().get(index);
-            stat.setCount(stat.getCount() + count);
-            saveAndReloadStats();
-        }
+    private void incrementStatByValue(String name, int count) {
+        Stat stat = statWrapper.getCurrentStats().get(name);
+        stat.setCount(stat.getCount() + count);
+        saveAndReloadStats();
     }
 
     private void saveAndReloadStats() {
@@ -62,9 +54,5 @@ public class StatService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void sortListByStatName(List<Stat> listToSort) {
-        listToSort.sort(Comparator.comparing(Stat::getStatName));
     }
 }
